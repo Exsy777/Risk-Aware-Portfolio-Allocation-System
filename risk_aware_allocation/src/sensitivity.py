@@ -33,6 +33,8 @@ def run_threshold_sensitivity(
 ) -> pd.DataFrame:
     """Run threshold sensitivity by reusing strategy and backtest pipeline per threshold."""
     thresholds = sorted(float(value) for value in threshold_values)
+    if not thresholds:
+        raise ValueError("threshold_values cannot be empty.")
     rows: list[dict[str, float]] = []
 
     for threshold in thresholds:
@@ -56,6 +58,8 @@ def run_threshold_sensitivity(
         rows.append({"threshold": threshold, **metrics})
 
     result = pd.DataFrame(rows)
+    if result.empty:
+        raise ValueError("No sensitivity results were produced.")
     return result.loc[:, REQUIRED_RESULT_COLUMNS]
 
 

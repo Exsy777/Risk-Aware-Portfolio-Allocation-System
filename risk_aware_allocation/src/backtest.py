@@ -35,6 +35,8 @@ def _validate_sorted_datetime_index(index: pd.DatetimeIndex, name: str) -> None:
         raise ValueError(f"{name} must be a DatetimeIndex.")
     if not index.is_monotonic_increasing:
         raise ValueError(f"{name} must be sorted ascending.")
+    if index.has_duplicates:
+        raise ValueError(f"{name} must not contain duplicate dates.")
 
 
 def expand_weights_to_daily_returns(
@@ -71,6 +73,12 @@ def compute_portfolio_returns(
     """Compute daily portfolio returns as weighted sum of asset returns."""
     _validate_sorted_datetime_index(daily_returns.index, "daily_returns.index")
     _validate_sorted_datetime_index(daily_weights.index, "daily_weights.index")
+
+    if daily_returns.empty or daily_weights.empty:
+        raise ValueError("daily_returns and daily_weights cannot be empty.")
+
+    if daily_returns.isna().any().any() or daily_weights.isna().any().any():
+        raise ValueError("daily_returns and daily_weights must not contain NaN values.")
 
     if not daily_returns.index.equals(daily_weights.index):
         raise ValueError("daily_returns and daily_weights must share identical indexes.")
@@ -138,6 +146,9 @@ def run_backtest(
 ) -> BacktestResult:
     """Run strategy and benchmark backtests from returns and strategy weights."""
     _validate_sorted_datetime_index(returns.index, "returns.index")
+
+    if returns.empty:
+        raise ValueError("returns cannot be empty.")
     _validate_sorted_datetime_index(strategy_result.weights.index, "strategy_result.weights.index")
 
     if not set(strategy_result.weights.columns).issubset(set(returns.columns)):

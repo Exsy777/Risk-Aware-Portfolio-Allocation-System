@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 import pandas as pd
+import pytest
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
@@ -81,3 +82,16 @@ def test_original_config_not_mutated() -> None:
     )
 
     assert config.strategy.volatility_threshold == 0.21
+
+
+def test_empty_threshold_values_raises() -> None:
+    predictions, returns = _inputs()
+    config = ProjectConfig()
+
+    with pytest.raises(ValueError, match="threshold_values cannot be empty"):
+        run_threshold_sensitivity(
+            predictions=predictions,
+            returns=returns,
+            config=config,
+            threshold_values=[],
+        )

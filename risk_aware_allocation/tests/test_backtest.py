@@ -141,3 +141,12 @@ def test_missing_assets_or_unsorted_indexes_raise_clear_errors() -> None:
     returns = _returns_frame().drop(columns=["SHY"])
     with pytest.raises(ValueError, match="missing"):
         run_backtest(returns=returns, strategy_result=strategy, config=cfg)
+
+
+def test_compute_portfolio_returns_raises_on_nan_inputs() -> None:
+    idx = pd.date_range("2024-01-01", periods=2, freq="D")
+    returns = pd.DataFrame({"SPY": [0.01, float("nan")], "SHY": [0.0, 0.0]}, index=idx)
+    weights = pd.DataFrame({"SPY": [0.8, 0.8], "SHY": [0.2, 0.2]}, index=idx)
+
+    with pytest.raises(ValueError, match="must not contain NaN"):
+        compute_portfolio_returns(returns, weights)

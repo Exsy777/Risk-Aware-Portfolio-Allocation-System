@@ -48,10 +48,19 @@ def build_weight_frame(
     else:
         pred_series = predictions.copy()
 
+    if pred_series.empty:
+        raise ValueError("predictions cannot be empty.")
+
     if not isinstance(pred_series.index, pd.DatetimeIndex):
         raise ValueError("predictions must be indexed by DatetimeIndex.")
 
+    if pred_series.index.has_duplicates:
+        raise ValueError("predictions index must not contain duplicate dates.")
+
     pred_series = pred_series.sort_index()
+
+    if pred_series.isna().any():
+        raise ValueError("predictions contain NaN values; clean inputs before strategy mapping.")
 
     tickers = list(config.data.tickers)
     high_keys = set(config.strategy.high_risk_weights.keys())

@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 
 import pandas as pd
+import pytest
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
@@ -117,3 +118,12 @@ def test_regime_summary_counts_work() -> None:
 
     assert summary[HIGH_RISK_LABEL] == 2
     assert summary[LOW_RISK_LABEL] == 2
+
+
+def test_build_weight_frame_raises_on_nan_predictions() -> None:
+    cfg = _config()
+    idx = pd.date_range("2024-01-01", periods=3, freq="D")
+    preds = pd.Series([0.10, float("nan"), 0.20], index=idx)
+
+    with pytest.raises(ValueError, match="NaN"):
+        build_weight_frame(predictions=preds, config=cfg)
