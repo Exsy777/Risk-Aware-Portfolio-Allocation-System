@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "risk-aware-allocation"
+version = "0.1.0"
+description = "Decision-focused risk forecasting and portfolio allocation system"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.2.0",
+  "numpy>=1.26.0",
+  "scikit-learn>=1.5.0",
+  "matplotlib>=3.8.0",
+  "yfinance>=0.2.40",
+  "streamlit>=1.37.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["risk_aware_allocation/src"]
+testpaths = ["risk_aware_allocation/tests"]
+addopts = "-q"
